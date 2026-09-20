@@ -1,0 +1,15 @@
+numpy
+pandas
+scikit-learn 
+dlib-bin #it gives a rectangle box around face or image
+#used to detect face embeddings using vector points
+git+https://github.com/ageitgey/face_recognition_models
+setuptools<70.0.0
+
+supabase #online database
+bcrypt #gives hashing methods to store passwords by hashing
+
+segno #used to generate qr codes
+pillow #used in image preprocessing 
+
+streamlit
