@@ -15,5 +15,5 @@ pillow #used in image preprocessing
 
 
 
-librosa#creates embeddings for voice
-resemblyzer#used for loading,cutting into segments
+librosa  
+resemblyzer
