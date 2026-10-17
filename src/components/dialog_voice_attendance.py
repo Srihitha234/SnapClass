@@ -73,6 +73,14 @@ def voice_attendance_dialog(selected_subject_id):
                         audio_bytes,
                         candidates_dict,
                     )
+                    st.session_state.voice_debug_info = {
+                    "registered_ids": list(candidates_dict.keys()),
+                    "detected_scores": detected_scores,
+                    }
+                    st.session_state["voice_debug_info"] = {
+    "registered_ids": list(candidates_dict.keys()),
+    "detected_scores": detected_scores,
+}
 
                     results = []
                     attendance_to_log = []
@@ -125,6 +133,7 @@ def voice_attendance_dialog(selected_subject_id):
                     )
 
                     st.session_state.show_voice_results = True
+                    st.rerun()
 
                     st.success(
                         "Analysis complete! Close this dialog "

@@ -1,3 +1,4 @@
+streamlit
 numpy
 pandas
 scikit-learn 
@@ -12,4 +13,7 @@ bcrypt #gives hashing methods to store passwords by hashing
 segno #used to generate qr codes
 pillow #used in image preprocessing 
 
-streamlit
+
+
+librosa#creates embeddings for voice
+resemblyzer#used for loading,cutting into segments

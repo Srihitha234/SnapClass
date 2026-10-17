@@ -101,79 +101,126 @@ def identify_speaker(
 # PROCESS BULK AUDIO
 # =========================================================
 
+
+def identify_speaker(
+    new_embedding,
+    candidates_dict,
+    threshold=0.65,
+):
+    if new_embedding is None or not candidates_dict:
+        return None, 0.0
+
+    new_embedding = np.asarray(
+        new_embedding, dtype=np.float32
+    ).flatten()
+
+    new_norm = np.linalg.norm(new_embedding)
+
+    if new_norm == 0:
+        return None, 0.0
+
+    best_sid = None
+    best_score = -1.0
+
+    for sid, stored_embedding in candidates_dict.items():
+        if stored_embedding is None:
+            continue
+
+        try:
+            stored = np.asarray(
+                stored_embedding, dtype=np.float32
+            ).flatten()
+
+            if stored.shape != new_embedding.shape:
+                continue
+
+            stored_norm = np.linalg.norm(stored)
+
+            if stored_norm == 0:
+                continue
+
+            # True cosine similarity
+            similarity = float(
+                np.dot(new_embedding, stored)
+                / (new_norm * stored_norm)
+            )
+
+            if similarity > best_score:
+                best_score = similarity
+                best_sid = sid
+
+        except (TypeError, ValueError):
+            continue
+
+    if best_sid is not None and best_score >= threshold:
+        return best_sid, best_score
+
+    return None, max(best_score, 0.0)
+
+
 def process_bulk_audio(
     audio_bytes,
     candidates_dict,
-    threshold=0.65
+    threshold=0.65,
 ):
-
     try:
-
         encoder = load_voice_encoder()
 
-        # Load audio
         audio, sr = librosa.load(
             io.BytesIO(audio_bytes),
-            sr=16000
+            sr=16000,
+            mono=True,
         )
 
-        # Find non-silent sections
+        if len(audio) == 0:
+            st.warning("The recording contains no audio.")
+            return {}
+
         segments = librosa.effects.split(
             audio,
-            top_db=30
+            top_db=30,
         )
 
         identified_results = {}
+        best_scores = {}
 
-        # Process every audio segment
         for start, end in segments:
-
-            # Ignore segments shorter than 0.5 seconds
-            if (end - start) < int(sr * 0.5):
-
+            if (end - start) < int(sr * 1.0):
                 continue
 
-            # Extract segment
             segment_audio = audio[start:end]
+            wav = preprocess_wav(segment_audio)
 
-            # Preprocess segment
-            wav = preprocess_wav(
-                segment_audio
-            )
+            if len(wav) == 0:
+                continue
 
-            # Generate embedding
-            embedding = encoder.embed_utterance(
-                wav
-            )
+            embedding = encoder.embed_utterance(wav)
 
-            # Identify speaker
             sid, score = identify_speaker(
                 embedding,
                 candidates_dict,
-                threshold
+                threshold,
             )
 
-            # If a speaker was identified
+            # Track the best score even if it didn't pass
+            # the threshold, for debugging.
+            if score > best_scores.get("best", -1.0):
+                best_scores["best"] = score
+
             if sid is not None:
-
-                # First time seeing this student
-                if sid not in identified_results:
-
+                if score > identified_results.get(sid, -1.0):
                     identified_results[sid] = score
 
-                # Keep strongest similarity score
-                elif score > identified_results[sid]:
+        if not identified_results:
+            st.warning(
+                "No registered voice matched the recording. "
+                f"Best cosine similarity: "
+                f"{best_scores.get('best', 0.0):.3f}. "
+                "Check the registered voice profiles and recording quality."
+            )
 
-                    identified_results[sid] = score
-
-        # IMPORTANT:
-        # Return only AFTER processing all segments
         return identified_results
 
     except Exception as e:
-
-        st.error(
-            f"Bulk process error: {e}"
-        )
-
+        st.error(f"Bulk audio processing failed: {e}")
         return {}

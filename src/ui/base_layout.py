@@ -1,234 +1,159 @@
+
 import streamlit as st
 
 
 def style_background_home():
-
     st.markdown("""
         <style>
-
-        /* =========================
-           HOME PAGE BACKGROUND
-           ========================= */
-
         .stApp {
             background: #5865F2 !important;
         }
 
-
-        /* =========================
-           STUDENT / TEACHER CARDS
-           ========================= */
-
         .stApp div[data-testid="stColumn"] {
             background-color: #E0E3FF !important;
-
             padding: 2.5rem !important;
-
             border-radius: 5rem !important;
         }
-
         </style>
     """, unsafe_allow_html=True)
 
 
 def style_background_dashboard():
-
     st.markdown("""
         <style>
-
-        /* =========================
-           DASHBOARD BACKGROUND
-           ========================= */
-
         .stApp {
             background: #E0E3FF !important;
         }
-
         </style>
     """, unsafe_allow_html=True)
 
 
 def style_base_layout():
-
     st.markdown("""
         <style>
-
-        /* =====================================================
-           GOOGLE FONTS
-           ===================================================== */
-
         @import url(
             'https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Cursive:wght@400..700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap'
         );
 
-
-        /* =====================================================
-           HIDE STREAMLIT DEFAULT UI
-           ===================================================== */
-
+        /* Hide default Streamlit UI */
         #MainMenu,
         footer,
         header {
             visibility: hidden;
         }
 
-
-        /* =====================================================
-           MAIN CONTAINER
-           ===================================================== */
-
+        /* Main container */
         .block-container {
             padding-top: 1.5rem !important;
         }
 
-
-        /* =====================================================
-           MAIN HEADING
-           ===================================================== */
-
-        h1 {
+        /* Main headings: black on the light dashboard */
+        .stApp h1,
+        .stApp h2 {
             font-family: 'Edu NSW ACT Cursive', cursive !important;
+            color: #000000 !important;
+        }
 
+        .stApp h1 {
             font-size: 3.5rem !important;
-
             line-height: 1.1 !important;
-
             margin-bottom: 0 !important;
-
-            color: black !important;
         }
 
-
-        /* =====================================================
-           SECONDARY HEADING
-           ===================================================== */
-
-        h2 {
-            font-family: 'Edu NSW ACT Cursive', cursive !important;
-
+        .stApp h2 {
             font-size: 2rem !important;
-
             line-height: 0.9 !important;
-
             margin-bottom: 0 !important;
-
-            color: black !important;
         }
 
-
-        /* =====================================================
-           NORMAL TEXT
-           ===================================================== */
-
-        h3,
-        h4,
-        p {
+        /* Normal dashboard text */
+        .stApp h3,
+        .stApp h4,
+        .stApp p {
             font-family: 'Roboto', sans-serif !important;
-
-            color: black !important;
+            color: #000000 !important;
         }
 
+        /* Dialog: override the dashboard's black text */
+        div[data-testid="stDialog"],
+        div[data-testid="stDialog"] h1,
+        div[data-testid="stDialog"] h2,
+        div[data-testid="stDialog"] h3,
+        div[data-testid="stDialog"] h4,
+        div[data-testid="stDialog"] p,
+        div[data-testid="stDialog"] label,
+        div[data-testid="stDialog"] span {
+            color: #FFFFFF !important;
+        }
 
-        /* =====================================================
-           ALL BUTTONS
-           ===================================================== */
+        div[data-testid="stDialog"] h1,
+        div[data-testid="stDialog"] h2 {
+            font-family: 'Roboto', sans-serif !important;
+        }
 
+        /* Toast notification text */
+        div[data-testid="stToast"],
+        div[data-testid="stToast"] p,
+        div[data-testid="stToast"] span {
+            color: #FFFFFF !important;
+        }
+
+        /* Buttons */
         button {
             border-radius: 1.5rem !important;
-
             padding: 10px 20px !important;
-
             border: none !important;
-
             font-family: 'Roboto', sans-serif !important;
-
             transition: transform 0.25s ease-in-out !important;
         }
 
-
-        /* =====================================================
-           PRIMARY BUTTON
-           ===================================================== */
-
+        /* Primary buttons */
         button[kind="primary"] {
             background-color: #5865F2 !important;
-
-            color: white !important;
+            color: #FFFFFF !important;
         }
 
         button[kind="primary"] p,
         button[kind="primary"] span {
-            color: white !important;
+            color: #FFFFFF !important;
         }
 
-
-        /* =====================================================
-           SECONDARY BUTTON
-           ===================================================== */
-
+        /* Secondary buttons */
         button[kind="secondary"] {
             background-color: #EB459E !important;
-
-            color: white !important;
+            color: #FFFFFF !important;
         }
 
         button[kind="secondary"] p,
         button[kind="secondary"] span {
-            color: white !important;
+            color: #FFFFFF !important;
         }
 
-
-        /* =====================================================
-           TERTIARY BUTTON
-           ===================================================== */
-
+        /* Tertiary buttons */
         button[kind="tertiary"] {
-            background-color: black !important;
-
-            color: white !important;
+            background-color: #000000 !important;
+            color: #FFFFFF !important;
         }
 
         button[kind="tertiary"] p,
         button[kind="tertiary"] span {
-            color: white !important;
+            color: #FFFFFF !important;
         }
 
-
-        /* =====================================================
-           TEXT INPUTS
-           ===================================================== */
-
-        input {
-            font-family: 'Roboto', sans-serif !important;
-        }
-
-
-        /* =====================================================
-           TEXT INPUT PLACEHOLDER
-           ===================================================== */
-
-        input::placeholder {
-            font-family: 'Roboto', sans-serif !important;
-        }
-
-
-        /* =====================================================
-           SELECT BOX / TEXT AREA
-           ===================================================== */
-
+        /* Input fields */
+        input,
         textarea,
         select {
             font-family: 'Roboto', sans-serif !important;
         }
 
-
-        /* =====================================================
-           BUTTON HOVER
-           ===================================================== */
-
-        button:hover {
-            transform: scale(1.05) !important;
+        input::placeholder {
+            font-family: 'Roboto', sans-serif !important;
         }
 
+        /* Button hover */
+        button:hover {
+            transform: scale(1.02) !important;
+        }
         </style>
     """, unsafe_allow_html=True)

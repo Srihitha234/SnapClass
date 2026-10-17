@@ -23,6 +23,7 @@ from src.database.db import (
     create_teacher,
     teacher_login,
     get_teacher_subjects,
+    get_attendance_for_teacher
 )
 from src.database.config import supabase
 from src.pipelines.face_pipeline import predict_attendance
@@ -160,7 +161,17 @@ def teacher_dashboard():
 
     elif st.session_state.current_teacher_tab == "attendance_records":
         teacher_tab_attendance_records()
-    
+    if st.session_state.get("show_voice_results", False):
+        saved_results = st.session_state.get(
+            "voice_attendance_results"
+        )
+
+        if saved_results is not None:
+            df_results, logs = saved_results
+
+            st.session_state.show_voice_results = False
+
+            attendance_result_dialog(df_results, logs)
 
     footer_dashboard()
 
@@ -446,13 +457,70 @@ def teacher_tab_manage_subjects():
 # ATTENDANCE RECORDS
 # =========================================================
 
+
 def teacher_tab_attendance_records():
     st.header("Attendance Records")
 
-    st.info(
-        "Attendance history will appear here once the records "
-        "view is implemented."
-    )
+    teacher_id = st.session_state.teacher_data["teacher_id"]
+
+    try:
+        records = get_attendance_for_teacher(teacher_id)
+
+        if not records:
+            st.info("No attendance records found yet.")
+            return
+
+        data = []
+
+        for r in records:
+            ts = r.get("timestamp")
+            subject = r.get("subjects") or {}
+
+            data.append({
+                "Time": (
+                    datetime.fromisoformat(
+                        ts.replace("Z", "+00:00")
+                    ).strftime("%Y-%m-%d %I:%M %p")
+                    if ts else "N/A"
+                ),
+                "Subject": subject.get("name", "Unknown"),
+                "Subject Code": subject.get("subject_code", "-"),
+                "Status": (
+                    "Present"
+                    if r.get("is_present", False)
+                    else "Absent"
+                ),
+            })
+
+        df = pd.DataFrame(data)
+
+        # Filter by subject
+        subjects = sorted(
+            df["Subject"].dropna().unique().tolist()
+        )
+
+        selected_subject = st.selectbox(
+            "Filter by Subject",
+            ["All Subjects"] + subjects,
+            key="attendance_records_subject_filter",
+        )
+
+        if selected_subject != "All Subjects":
+            df = df[df["Subject"] == selected_subject]
+
+        st.metric("Total Attendance Records", len(df))
+
+        st.dataframe(
+            df,
+            hide_index=True,
+            width="stretch",
+        )
+
+    except Exception as e:
+        st.error(f"Could not load attendance records: {e}")
+
+
+
 
 
 # =========================================================

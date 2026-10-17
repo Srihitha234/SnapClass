@@ -130,3 +130,9 @@ def attendance_result_dialog(df, logs):
 # Keep these names available for existing imports.
 show_attendance_result = attendance_result_dialog
 show_attendance_results = attendance_result_dialog
+debug = st.session_state.get("voice_debug_info")
+
+if debug:
+    with st.expander("Voice recognition debug"):
+        st.write("Registered student IDs:", debug["registered_ids"])
+        st.write("Detected student IDs and scores:", debug["detected_scores"])
